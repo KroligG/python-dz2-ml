@@ -1,6 +1,6 @@
 from itertools import izip
 from math import sqrt
-from operator import index
+from random import shuffle as random_shuffle
 
 
 class ml_table:
@@ -39,6 +39,12 @@ class ml_table:
         if enforce_types:
             self.__enforce_types()
 
+    def get_rows(self):
+        return self._table[:]
+
+    def get_headers(self):
+        return self._headers[:]
+
     def __update_types(self, row):
         next_type = {int: float, float: str}
         if not self._types:
@@ -58,15 +64,19 @@ class ml_table:
                 row[i] = self._types[i](row[i])
 
     @classmethod
-    def load_table(cls, filename, has_headers=False, separator=","):
+    def load_table(cls, filename, has_headers=False, separator=",", shuffle=False):
         table = cls()
-        with open(filename, 'r') as f:
-            rows = [[val.strip() for val in line.split(separator)] for line in f]
-            if has_headers:
-                table.set_headers(rows[0])
-                rows = rows[1:]
-            table.set_rows(rows)
+        rows = [[val.strip() for val in line.split(separator)] for line in open(filename, 'r')]
+        if has_headers:
+            table.set_headers(rows[0])
+            rows = rows[1:]
+        if shuffle:
+            random_shuffle(rows)
+        table.set_rows(rows)
         return table
+
+    def shuffle(self):
+        random_shuffle(self._table)
 
     def print_table(self, write_headers=True, separator=","):
         result = []
@@ -149,7 +159,10 @@ class ml_table:
 
     def __getitem__(self, key):
         index = self.get_index(key)
-        return self._table[index]
+        if isinstance(index, int):
+            return self._table[index]
+        elif isinstance(index, slice):
+            return ml_table(headers=self._headers, rows=self._table[index])
 
     def __iter__(self):
         return iter(self._table)
