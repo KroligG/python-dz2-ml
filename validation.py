@@ -1,5 +1,4 @@
 from math import ceil
-import ml_table
 
 
 def split(table, coef=0.75, shuffle=False):
@@ -16,11 +15,9 @@ def k_fold(table, N, algo, shuffle=False):
     step = int(ceil(float(len(table)) / N))
     result = 0.0
     for i in xrange(N):
-        learning_rows = table.get_rows()
-        test_rows = learning_rows[i * step:(i + 1) * step]
-        del learning_rows[i * step:(i + 1) * step]
-        learning = ml_table.ml_table(rows=learning_rows, headers=table.get_headers())
-        test = ml_table.ml_table(rows=test_rows, headers=table.get_headers())
+        learning = table[:]
+        test = learning[i * step:(i + 1) * step]
+        del learning[i * step:(i + 1) * step]
         algo.learn(learning)
         result += algo.test(test)
     return result / N
