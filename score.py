@@ -1,5 +1,5 @@
 def f1_score(matrix, test_set):
-    [total, [tp, fp], [fn, tn]] = matrix
+    [[tp, fp], [fn, tn]] = matrix
     precision = float(tp) / (tp + fp)
     recall = float(tp) / (tp + fn)
     f1 = 2 * precision * recall / (precision + recall)
