@@ -42,6 +42,10 @@ class ml_table:
     def get_rows(self):
         return self._table[:]
 
+    def get_row(self, key):
+        index = self.get_index(key)
+        return self._table[index][:]
+
     def get_headers(self):
         return self._headers[:]
 
@@ -167,8 +171,10 @@ class ml_table:
         return len(self._table)
 
     def __getitem__(self, key):
-        if isinstance(key, (int, slice)):
+        if isinstance(key, slice):
             return ml_table(headers=self._headers, rows=self._table[key])
+        elif isinstance(key, int):
+            return ml_table(headers=self._headers, rows=[self._table[key]])
         else:
             raise ValueError()
 
