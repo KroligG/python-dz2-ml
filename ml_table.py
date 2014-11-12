@@ -4,7 +4,7 @@ from random import shuffle as random_shuffle
 
 
 class ml_table:
-    def __init__(self, rows=None, headers=False):
+    def __init__(self, rows=None, headers=None):
         self._headers = []
         self._table = []
         self._rowlen = -1
@@ -25,7 +25,7 @@ class ml_table:
         if rows:
             for row in rows:
                 self.add_row(row, enforce_types=False)
-            self.__enforce_types()
+            self.enforce_types()
 
     def add_row(self, row, enforce_types=True):
         if self._rowlen == -1:
@@ -37,7 +37,7 @@ class ml_table:
         self.__update_types(row)
         self._table.append(row[:])
         if enforce_types:
-            self.__enforce_types()
+            self.enforce_types()
 
     def get_rows(self):
         return self._table[:]
@@ -58,7 +58,7 @@ class ml_table:
             else:
                 raise ValueError("Supported types are: int, float, str")
 
-    def __enforce_types(self):
+    def enforce_types(self):
         for row in self._table:
             for i in xrange(len(row)):
                 row[i] = self._types[i](row[i])
@@ -167,9 +167,7 @@ class ml_table:
         return len(self._table)
 
     def __getitem__(self, key):
-        if isinstance(key, int):
-            return self._table[key]
-        elif isinstance(key, slice):
+        if isinstance(key, (int, slice)):
             return ml_table(headers=self._headers, rows=self._table[key])
         else:
             raise ValueError()

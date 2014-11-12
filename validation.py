@@ -1,4 +1,5 @@
 from math import ceil
+import score
 
 
 def split(table, coef=0.75, shuffle=False):
@@ -9,7 +10,7 @@ def split(table, coef=0.75, shuffle=False):
     return table[:learning_size], table[learning_size:]
 
 
-def k_fold(table, N, algo, shuffle=False):
+def k_fold(table, N, algo, columns, class_column, shuffle=False, score=score.f1_score):
     if shuffle:
         table.shuffle()
     step = int(ceil(float(len(table)) / N))
@@ -18,6 +19,7 @@ def k_fold(table, N, algo, shuffle=False):
         learning = table[:]
         test = learning[i * step:(i + 1) * step]
         del learning[i * step:(i + 1) * step]
-        algo.learn(learning)
-        result += algo.test(test)
+        algo.learn(learning, columns, class_column)
+        test_results = algo.test(test)
+        result += score(*test_results)
     return result / N
